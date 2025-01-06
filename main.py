@@ -1,64 +1,59 @@
 import flet as ft
 
+class Login(ft.UserControl):
+    def __init__(self,page,*args, **kwargs):
+        super().__init__()
+        self.page = page
+    def build(self):
+        return ft.Column([ft.Row([ft.TextButton("Create Account",on_click=lambda _:self.page.go("/signup"))], alignment=ft.MainAxisAlignment.END),
+                          ft.Row([ft.Text("Login", size = 30,weight="bold")],alignment=ft.MainAxisAlignment.CENTER),
+                          ft.Row([ft.Text("Please enter your information below in order to login to your account.",width=275,text_align="center")], alignment=ft.MainAxisAlignment.CENTER),
+                          ft.Container(content=ft.Column([
+                              ft.Row([ft.Text("User Name:")]),
+                              ft.Row([ft.TextField()]),
+                              ft.Row([ft.Text("Password:")]),
+                              ft.Row([ft.TextField()]),
+                              ft.Row([ft.Text("Forgot password?")],ft.MainAxisAlignment.END),
+                              ft.Row([ft.Container(content=ft.ElevatedButton("Login",expand=1,bgcolor="orange",color="white"),width=300,height=40,border_radius=15)],ft.MainAxisAlignment.CENTER),
+                              ft.Row([ft.Text("Or use social media account for login")],alignment=ft.MainAxisAlignment.CENTER),
+                              ]),padding=10)])
 
-def main(page:ft.Page):
-    page.title = "Multi-Page Navigation Example"
-    page.theme_mode = "light"
+class Signup(ft.UserControl):
+    def __init__(self,page,*args, **kwargs):
+        super().__init__()
+        self.page = page
+    def build(self):
+        return ft.Column([ft.Row([ft.IconButton(icon=ft.icons.ARROW_LEFT,on_click=lambda _:self.page.go("/"))], alignment=ft.MainAxisAlignment.START),
+                          ft.Row([ft.Text("Sign Up", size = 30,weight="bold")],alignment=ft.MainAxisAlignment.CENTER),
+                          ft.Row([ft.Text("Please enter your information below in order to login to your account.",width=275,text_align="center")], alignment=ft.MainAxisAlignment.CENTER),
+                          ft.Container(content=ft.Column([
+                              ft.Row([ft.Text("User Name:")]),
+                              ft.Row([ft.TextField()]),
+                              ft.Row([ft.Text("Email:")]),
+                              ft.Row([ft.TextField()]),
+                              ft.Row([ft.Text("Password:")]),
+                              ft.Row([ft.TextField()]),
+                              ft.Row([ft.Text("Confirm Password:")]),
+                              ft.Row([ft.TextField()]),
+                              ft.Row([ft.ElevatedButton("Sign Up",expand=1,bgcolor="orange",color="white")],ft.MainAxisAlignment.CENTER),
+                              ft.Row([ft.Text("Or use social media account for login")],alignment=ft.MainAxisAlignment.CENTER),
+                              ]),padding=ft.padding.only(left=10,right=10))])
 
-    def home_page():
-        return ft.View(
-            "/home",
-            controls=[
-                ft.Text("Welcome to the Home Page!", size=24, weight="bold"),
-                ft.Text("Use the navigation bar to switch pages."),
-            ],
-            appbar=ft.AppBar(title=ft.Text("Home")),
-            navigation_bar=navigation_bar("home"),
-        )
-    def settings_page():
-        return ft.View(
-            "/settings",
-            controls=[
-                ft.Text("Settings Page", size=24, weight="bold"),
-                ft.Text("Here you can configure your preferences."),
-            ],
-            appbar=ft.AppBar(title=ft.Text("Settings")),
-            navigation_bar=navigation_bar("settings"),
-        )   
-    def about_page():    
-        return ft.View(
-            "/about",
-            controls=[
-                ft.Text("About Page", size=24, weight="bold"),
-                ft.Text("Learn more about this application."),
-            ],
-            appbar=ft.AppBar(title=ft.Text("About")),
-            navigation_bar=navigation_bar("about"),
-        )   
 
-    def navigate_to(page_name):
+def main(page: ft.Page):
+    page.window.width = 360
+    page.window.height = 600
+    page.theme_mode = ft.ThemeMode.LIGHT
+
+    def route_chnage(e: ft.RouteChangeEvent):
         page.views.clear()
-        if page_name == "home":
-            page.views.append(home_page())
-        elif page_name == "settings":
-            page.views.append(settings_page())
-        elif page_name == "about":
-            page.views.append(about_page())
+        page.views.append(ft.View("/",[Login(page)]))
+        if page.route == "/signup":
+            page.views.append(ft.View("/signup",[Signup(page)]))
+
         page.update()
+    page.on_route_change = route_chnage
+    page.go("/")
 
-    def navigation_bar(selected_page):
-        return ft.NavigationBar(
-            destinations=[
-                ft.NavigationBarDestination(icon=ft.icons.HOME, label="Home"),  
-                ft.NavigationBarDestination(icon=ft.icons.SETTINGS, label="Settings"), 
-                ft.NavigationBarDestination(icon=ft.icons.INFO, label="About")],
-                selected_index=["home", "settings", "about"].index(selected_page),
-                on_change=lambda e: navigate_to(["home", "settings", "about"][e.control.selected_index]),)
-    
-    
-    page.views.append(home_page())
-    page.update()
 
-    
-ft.app(target=main, assets_dir="assets")
-    
+ft.app(main)
